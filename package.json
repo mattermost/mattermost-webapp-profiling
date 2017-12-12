@@ -1,0 +1,13 @@
+{
+  "name": "mattermost-webapp-profiling",
+  "version": "0.0.1",
+  "description": "Under construction project for automated profiling of the Mattermost web app.",
+  "author": "Joram Wilander",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/mattermost/mattermost-webapp-profiling",
+  "dependencies": {
+    "chrome-launcher": "0.3.2",
+    "chrome-remote-interface": "0.25.4",
+    "node-fetch": "1.7.3"
+  }
+}
