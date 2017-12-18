@@ -9,22 +9,30 @@ let rawEvents = [];
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 
-const url = 'http://192.168.1.131:8065';
+const url = process.argv[2];
 
 (async function() {
+    if (url == null) {
+        console.error('Must provide dockerhost URL as an argument. Easier to just use `make run`.'); //eslint-disable-line no-console
+        process.exit(1);
+    }
+
     const chrome = await chromelauncher.launch({port: 9222});
     const client = await cdp();
-    const {Tracing, Page, Network} = client;
+    const {Tracing, Page, Network, Runtime} = client;
 
     // Set up user environment
-    const response = await fetch(url + '/api/v4/users/login', {method: 'POST', body: JSON.stringify({login_id: 'jim@bladekick.com', password: 'test1234'})});
+    const response = await fetch('http://localhost:8065/api/v4/users/login', {method: 'POST', body: JSON.stringify({login_id: 'test@test.com', password: 'test1234'})});
     const token = response.headers.get('Token');
 
     const user = await response.json();
 
-    let complete = false;
     const filePrefix = 'profiles/profile-page-load-';
-    fs.mkdirSync('profiles');
+    try {
+        fs.mkdirSync('profiles');
+    } catch (err) {
+        // do nothing
+    }
 
     Network.setCookie(
         {
@@ -56,10 +64,9 @@ const url = 'http://192.168.1.131:8065';
         console.log('Trace file: ' + file); //eslint-disable-line no-console
         console.log('You can open the trace file in DevTools Performance panel.\n'); //eslint-disable-line no-console
 
-        if (complete) {
-            await client.close();
-            await chrome.kill();
-        }
+        await client.close();
+        await chrome.kill();
+        process.exit();
     });
 
     Tracing.dataCollected((data) => {
@@ -71,8 +78,26 @@ const url = 'http://192.168.1.131:8065';
     Page.enable();
     Tracing.start(tracingOptions);
 
-    Page.navigate({url: url + '/billers/channels/start'});
-    await sleep(10000); // 10 seconds should be enough for page load
-    complete = true;
+    Page.navigate({url: url + '/testteam/channels/start'});
+    await sleep(5000);
+
+    // Trace channel switch
+    await Runtime.evaluate({
+        expression: `
+            var el = document.querySelector('a[href="/testteam/channels/end"]');
+            el.click();
+        `
+    });
+
+    await sleep(5000);
+
+    // Trace team switch
+    await Runtime.evaluate({
+        expression: `
+            var el = document.querySelector('a[href="/testteam2"]');
+            el.click();
+        `
+    });
+    await sleep(5000);
     Tracing.end();
 })();
