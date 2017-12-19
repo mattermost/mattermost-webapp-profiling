@@ -16,9 +16,6 @@ install: .npminstall ## Installs dependencies
 		docker pull justinribeiro/chrome-headless; \
 	fi
 
-	@echo Preloading MM database
-	mysql --host=dockerhost --user=mmuser --password=mostest mattermost_test < db/testdbdump.sql
-
 .npminstall: package.json
 	@echo Getting dependencies using npm
 	npm install

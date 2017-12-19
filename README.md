@@ -10,10 +10,11 @@ Project for automated profiling of the [Mattermost web app](https://github.com/m
 
 ## Usage
 
-1. Start up your Mattermost server at http://localhost:8065
-2. Run `make install`
-3. Run `make run`
-4. Open up Chrome and load the profile created in `./profiles/` into the Performance tab
+1. Run `make install`
+2. Load the db/testdbdump.sql into your mysql database
+3. Start up your Mattermost server at http://localhost:8065
+4. Run `make run`
+5. Open up Chrome and load the profile created in `./profiles/` into the Performance tab
 
 Use `make clean` to clean up the docker container and your environment.
 
