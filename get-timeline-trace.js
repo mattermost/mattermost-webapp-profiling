@@ -34,7 +34,6 @@ let port = process.argv[3];
 
     const user = await response.json();
 
-    const filePrefix = 'profiles/profile-page-load-';
     try {
         fs.mkdirSync('profiles');
     } catch (err) {
@@ -66,7 +65,7 @@ let port = process.argv[3];
     };
 
     Tracing.tracingComplete(async () => {
-        const file = filePrefix + Date.now() + '.devtools.trace';
+        const file = 'profiles/mattermost-webapp-profile-' + Date.now() + '.devtools.trace';
         fs.writeFileSync(file, JSON.stringify(rawEvents, null, 2));
         console.log('Trace file: ' + file); //eslint-disable-line no-console
         console.log('You can open the trace file in DevTools Performance panel.\n'); //eslint-disable-line no-console
