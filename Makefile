@@ -8,6 +8,8 @@ else ifeq ($(shell uname), Linux)
 	DOCKER_HOST = $(shell ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
 endif
 
+MMPORT ?= 8065
+
 install: .npminstall ## Installs dependencies
 	@echo Installing dependencies
 
@@ -33,7 +35,7 @@ run: ## Runs the profiling
 	fi
 
 	@echo Starting profiling
-	node get-timeline-trace.js 'http://$(DOCKER_HOST):8065'
+	node get-timeline-trace.js 'http://$(DOCKER_HOST)' $(MMPORT)
 
 stop-docker: ## Stops the docker container
 	@echo Stopping docker containers

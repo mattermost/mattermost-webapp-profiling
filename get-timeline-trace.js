@@ -9,7 +9,8 @@ let rawEvents = [];
 
 const sleep = n => new Promise(resolve => setTimeout(resolve, n));
 
-const url = process.argv[2];
+let url = process.argv[2];
+let port = process.argv[3];
 
 (async function() {
     if (url == null) {
@@ -17,12 +18,18 @@ const url = process.argv[2];
         process.exit(1);
     }
 
+    if (port == null) {
+        port = '80';
+    }
+
+    url += ':' + port;
+
     const chrome = await chromelauncher.launch({port: 9222});
     const client = await cdp();
     const {Tracing, Page, Network, Runtime} = client;
 
     // Set up user environment
-    const response = await fetch('http://localhost:8065/api/v4/users/login', {method: 'POST', body: JSON.stringify({login_id: 'test@test.com', password: 'test1234'})});
+    const response = await fetch('http://localhost:' + port + '/api/v4/users/login', {method: 'POST', body: JSON.stringify({login_id: 'test@test.com', password: 'test1234'})});
     const token = response.headers.get('Token');
 
     const user = await response.json();
