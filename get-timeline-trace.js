@@ -28,6 +28,13 @@ let port = process.argv[3];
     const client = await cdp();
     const {Tracing, Page, Network, Runtime} = client;
 
+    await Network.emulateNetworkConditions({
+      offline: false,
+      latency: 250,
+      downloadThroughput: 524288,
+      uploadThroughput: 131072
+    });
+
     // Set up user environment
     const response = await fetch('http://localhost:' + port + '/api/v4/users/login', {method: 'POST', body: JSON.stringify({login_id: 'test@test.com', password: 'test1234'})});
     const token = response.headers.get('Token');
@@ -81,11 +88,12 @@ let port = process.argv[3];
     });
 
     // Trace initial page load
+
     Page.enable();
     Tracing.start(tracingOptions);
 
     Page.navigate({url: url + '/testteam/channels/start'});
-    await sleep(5000);
+    await sleep(15000);
 
     // Trace channel switch
     await Runtime.evaluate({
@@ -104,6 +112,6 @@ let port = process.argv[3];
             el.click();
         `
     });
-    await sleep(5000);
+    await sleep(3000);
     Tracing.end();
 })();
