@@ -76,7 +76,6 @@ let port = process.argv[3];
 
       const tracingOptions = {
           categories: TRACE_CATEGORIES.join(','),
-          options: 'sampling-frequency=10000'  // 1000 is default and too slow.
       };
 
 
@@ -85,21 +84,7 @@ let port = process.argv[3];
       await Page.navigate({url: url + '/testteam/channels/start'});
       await sleep(30000);
 
-      // Set up tracing
-
-      Tracing.tracingComplete(async () => {
-          const file = 'profiles/mattermost-webapp-profile-' + Date.now() + '.devtools.trace';
-          fs.writeFileSync(file, JSON.stringify(rawEvents, null, 2));
-          console.log('Trace file: ' + file); //eslint-disable-line no-console
-          console.log('You can open the trace file in DevTools Performance panel.\n'); //eslint-disable-line no-console
-
-          await cdp.Close({id: tab.id});
-          await client.close();
-          await chrome.kill();
-          process.exit();
-      });
-
-      Tracing.dataCollected((data) => {
+      await Tracing.dataCollected((data) => {
           var events = data.value;
           rawEvents = rawEvents.concat(events);
       });
@@ -121,8 +106,19 @@ let port = process.argv[3];
               el.click();
           `
       });
+
       await sleep(7000);
-      Tracing.end();
+      await Tracing.end();
+      await Tracing.tracingComplete();
+      const file = 'profiles/mattermost-webapp-profile-' + Date.now() + '.devtools.trace';
+      fs.writeFileSync(file, JSON.stringify(rawEvents, null, 2));
+      console.log('Trace file: ' + file); //eslint-disable-line no-console
+      console.log('You can open the trace file in DevTools Performance panel.\n'); //eslint-disable-line no-console
+
+      await cdp.Close({id: tab.id});
+      await client.close();
+      await chrome.kill();
+      process.exit();
     } catch (e) {
       console.log(e);
       await cdp.Close({id: tab.id});
