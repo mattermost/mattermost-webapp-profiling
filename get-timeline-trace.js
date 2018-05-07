@@ -76,6 +76,7 @@ let port = process.argv[3];
 
       const tracingOptions = {
           categories: TRACE_CATEGORIES.join(','),
+          options: 'sampling-frequency=10000'  // 1000 is default and too slow.
       };
 
 
