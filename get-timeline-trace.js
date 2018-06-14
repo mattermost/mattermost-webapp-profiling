@@ -83,7 +83,7 @@ let port = process.argv[3];
       await Tracing.start(tracingOptions);
 
       await Page.navigate({url: url + '/testteam/channels/start'});
-      await sleep(30000);
+      await sleep(14000);
 
       await Tracing.dataCollected((data) => {
           var events = data.value;
@@ -98,7 +98,7 @@ let port = process.argv[3];
           `
       });
 
-      await sleep(7000);
+      await sleep(2100);
 
       // Trace team switch
       await Runtime.evaluate({
@@ -108,7 +108,7 @@ let port = process.argv[3];
           `
       });
 
-      await sleep(7000);
+      await sleep(3000);
       await Tracing.end();
       await Tracing.tracingComplete();
       const file = 'profiles/mattermost-webapp-profile-' + Date.now() + '.devtools.trace';
